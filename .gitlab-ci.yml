@@ -20,7 +20,7 @@ stages:
   - deploy
 
 # Construction of the Docker image of this repo
-docker-image-fast-api:
+docker-image-api-monitoreo:
   stage: build
   only:
     - dev
