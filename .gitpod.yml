@@ -6,9 +6,9 @@ tasks:
   - name: Install dependencies
     init: pip install -r requirements.dev.txt
   - name: Build final
-    init: docker build -t registry.gitlab.com/trq-fundacion/fast-api -f ./docker/Dockerfile.backend .
+    init: docker build -t registry.gitlab.com/trq-fundacion/api-monitoreo -f ./docker/Dockerfile.backend .
   - name: Push final
-    init: docker push registry.gitlab.com/trq-fundacion/fast-api
+    init: docker push registry.gitlab.com/trq-fundacion/api-monitoreo
   - name: Linters
     init: flake8
 vscode:
