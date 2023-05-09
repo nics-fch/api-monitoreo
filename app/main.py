@@ -1,15 +1,22 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+from .routes.monitorRoute import router
+from dotenv import load_dotenv
 
-from .api.v1.api import api 
+# Loading environment variables from .env
+load_dotenv()
 
+# The main object is created
 app = FastAPI(
-    title="API BASE",
-    description="Api base para proyectos",
-    version="1.0.0",
-    )
+    title="API Monitoreo",
+    version="v1.0",
+    description="SMC - API Monitoreo DP",
+)
 
+# By default we send them to the docs
+@app.get("/")
+async def docs_redirect():
+    return RedirectResponse(url='/docs')
 
-# API Versioning
-app.include_router(api, prefix="/api/v1")
-
-
+#We include all our routes
+app.include_router(router)
