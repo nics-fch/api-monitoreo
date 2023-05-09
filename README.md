@@ -8,6 +8,6 @@
 ```bash
 docker login registry.gitlab.com
 
-docker build -t registry.gitlab.com/trq-fundacion/fast-api:infy-dev .
-docker push registry.gitlab.com/trq-fundacion/fast-api:infy-dev
+docker build -t registry.gitlab.com/trq-fundacion/api-monitoreo:infy-dev .
+docker push registry.gitlab.com/trq-fundacion/api-monitoreo:infy-dev
 ```
