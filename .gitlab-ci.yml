@@ -9,10 +9,10 @@ variables:
   DOCKER_DRIVER: overlay2
   # See https://github.com/docker-library/docker/pull/166
   DOCKER_TLS_CERTDIR: ""
-  JIRA_HEADER: "Accept: application/json"
-  JIRA_SERVER: "fundacionchile.atlassian.net"
-  JIRA_USERNAME: "patricio.merino@fch.cl"
-  JIRA_TOKEN: "twP9sTwMrA2vVRDpSyH0030D"
+  JIRA_HEADER: $JIRA_HEADER
+  JIRA_SERVER: $JIRA_SERVER
+  JIRA_USERNAME: $JIRA_USERNAME
+  JIRA_TOKEN: $JIRA_TOKEN
 
 stages:
   - build
