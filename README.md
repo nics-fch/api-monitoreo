@@ -1,7 +1,5 @@
 # Desarrollo local
 
-Levantar con
-
 ```bash
 docker-compose up -d --build
 ```
