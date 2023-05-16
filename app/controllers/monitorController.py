@@ -27,37 +27,49 @@ async def getAlert(instalacion_id: UUID):
             buffer[detail['groups']] = int(detail['count'])
 
         if 'A' in buffer.keys() and buffer['A'] > 0:
-            group = 1
+            alert = 1
         elif 'B' in buffer.keys() and buffer['B'] > 0:
-            group = 2
+            alert = 2
         elif 'C' in buffer.keys() and buffer['C'] > 0:
-            group = 3
+            alert = 3
         else:
-            group = 0
+            alert = 0
 
         list_response = [0, 1, 2, 3]
-        v = random.choice(list_response)
+        alert = random.choice(list_response)
 
-        return { "status": 200, "response": v }
+        history = [{
+            'fecha': '12/04/2023',
+            'evento': 'Lorem ipsum dolor sit amet consectetur pellentesque',
+            'alerta': 'Amarillo',
+            'estado': 'Activo',
+            'descripcion': 'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet',
+            'mensaje': 'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis'
+        },{
+            'fecha': '14/05/2023',
+            'evento': 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium',
+            'alerta': 'Amarilla',
+            'estado': 'Inactivo',
+            'descripcion': 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque',
+            'mensaje': 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur'
+        },{
+            'fecha': '15/06/2023',
+            'evento': 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit',
+            'alerta': 'Roja',
+            'estado': 'Inactivo',
+            'descripcion': 'Aquas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga',
+            'mensaje': 'Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus.'
+        }]
+
+        return { "status": 200, "response": { "alert": alert, "history": history } }
 
     except Exception as e:
         return { "status": 500 }
 
 # Functions that interact with the ORM
+"""
 async def getHistoryAlert(instalacion_id: UUID):
     try:
-        """
-        data = await Ticket.filter(
-            # Filtros opcionales para ModelA
-        ).prefetch_related(
-            'related_model_b',
-            'related_model_b__related_model_c',
-            'related_model_d'
-        )
-        """
-
-        #tickets = Ticket.filter(instalacion_id=instalacion_id)
-
         buffer = [{
             'fecha': '12/04/2023',
             'evento': 'Lorem ipsum dolor sit amet consectetur pellentesque',
@@ -85,3 +97,4 @@ async def getHistoryAlert(instalacion_id: UUID):
 
     except Exception as e:
         return { "status": 500 }
+"""
