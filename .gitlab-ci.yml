@@ -9,10 +9,10 @@ variables:
   DOCKER_DRIVER: overlay2
   # See https://github.com/docker-library/docker/pull/166
   DOCKER_TLS_CERTDIR: ""
-  JIRA_HEADER: "Accept: application/json"
-  JIRA_SERVER: "fundacionchile.atlassian.net"
-  JIRA_USERNAME: "patricio.merino@fch.cl"
-  JIRA_TOKEN: "twP9sTwMrA2vVRDpSyH0030D"
+  JIRA_HEADER: $JIRA_HEADER
+  JIRA_SERVER: $JIRA_SERVER
+  JIRA_USERNAME: $JIRA_USERNAME
+  JIRA_TOKEN: $JIRA_TOKEN
 
 stages:
   - build
@@ -80,38 +80,18 @@ test:
     - master
     - tags
     - merge_requests
-  image: ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG}
-  allow_failure: true
-  variables:
-    POSTGRES_DB: backend
-    POSTGRES_USER: backend
-    POSTGRES_PASSWORD: password
-    DATABASE_HOST: postgres
-    ELASTICSEARCH_HOST: elasticsearch
-    ELASTICSEARCH_PORT: 9200
-    ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-  services:
-    - name: mdillon/postgis:10
-      alias: postgres
-    - name: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-      alias: elasticsearch
-      command: ["elasticsearch", "-Ediscovery.type=single-node"]
+  image: python:3.8
   script:
     - pip install -r requirements.dev.txt
-    - coverage run --branch --source=src src/manage.py test -v 2 --failfast 
-    - coverage xml -i
-    - mkdir coverage-reports
-    - coverage html -d coverage-reports
-    - mv coverage.xml coverage-reports/coverage-report.xml
+    - coverage run -m pytest
+    - coverage report
+    - coverage xml
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
-    paths:
-      - coverage-reports
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: coverage-reports/coverage-report.xml
-
+        path: coverage.xml
 # Generates a report of the used libraries by this repo with the licenses
 licenses_allow_failure:
   stage: test
@@ -199,74 +179,6 @@ owasp_dependency_check:
 # Vulnerability scanning for Docker local images allows developers and development teams to review the
 # security state of the container images and take actions to fix issues identified during the scan,
 # resulting in more secure deployments
-container_scan_base_allow_failure:
-  stage: test
-  only:
-    - dev
-    - fch-alpha
-    - infy-dev
-    - alpha
-    - tags
-  image: docker:stable
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: overlay2
-  script:
-    - docker run -d --name db arminc/clair-db:latest
-    - docker run -p 6060:6060 --link db:postgres -d --name clair --restart on-failure arminc/clair-local-scan:v2.0.1
-    - apk add -U wget ca-certificates
-    - docker login -u gitlab-ci-token -p "${CI_JOB_TOKEN}" "${CI_REGISTRY}"
-    - docker pull ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG}
-    - wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
-    - mv clair-scanner_linux_amd64 clair-scanner
-    - chmod +x clair-scanner
-    - touch clair-whitelist.yml
-    - while( ! wget -q -O /dev/null http://docker:6060/v1/namespaces ) ; do sleep 1 ; done
-    - retries=0
-    - echo "Waiting for clair daemon to start"
-    - while( ! wget -T 10 -q -O /dev/null http://docker:6060/v1/namespaces ) ; do sleep 1 ; echo -n "." ; if [ $retries -eq 10 ] ; then echo " Timeout, aborting." ; exit 1 ; fi ; retries=$(($retries+1)) ; done
-    - ./clair-scanner -c http://docker:6060 --ip $(hostname -i) -r container-scanning-report.json -l clair.log ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG} || true
-    - cat container-scanning-report.json
-  allow_failure: true
-  artifacts:
-    paths: [container-scanning-report.json]
-
-# Vulnerability scanning for Docker local images allows developers and development teams to review the
-# security state of the container images and take actions to fix issues identified during the scan,
-# resulting in more secure deployments
-container_scan_base:
-  stage: test
-  only:
-    - preprod
-    - master
-  image: docker:stable
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: overlay2
-  script:
-    - docker run -d --name db arminc/clair-db:latest
-    - docker run -p 6060:6060 --link db:postgres -d --name clair --restart on-failure arminc/clair-local-scan:v2.0.1
-    - apk add -U wget ca-certificates
-    - docker login -u gitlab-ci-token -p "${CI_JOB_TOKEN}" "${CI_REGISTRY}"
-    - docker pull ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG}
-    - wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
-    - mv clair-scanner_linux_amd64 clair-scanner
-    - chmod +x clair-scanner
-    - touch clair-whitelist.yml
-    - while( ! wget -q -O /dev/null http://docker:6060/v1/namespaces ) ; do sleep 1 ; done
-    - retries=0
-    - echo "Waiting for clair daemon to start"
-    - while( ! wget -T 10 -q -O /dev/null http://docker:6060/v1/namespaces ) ; do sleep 1 ; echo -n "." ; if [ $retries -eq 10 ] ; then echo " Timeout, aborting." ; exit 1 ; fi ; retries=$(($retries+1)) ; done
-    - ./clair-scanner -c http://docker:6060 --ip $(hostname -i) -r container-scanning-report.json -l clair.log ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG} || true
-    - cat container-scanning-report.json
-  artifacts:
-    paths: [container-scanning-report.json]
-
-# Vulnerability scanning for Docker local images allows developers and development teams to review the
-# security state of the container images and take actions to fix issues identified during the scan,
-# resulting in more secure deployments
 container_scan_allow_failure:
   stage: test
   only:
@@ -280,13 +192,12 @@ container_scan_allow_failure:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
-  allow_failure: true
   script:
     - docker run -d --name db arminc/clair-db:latest
     - docker run -p 6060:6060 --link db:postgres -d --name clair --restart on-failure arminc/clair-local-scan:v2.0.1
     - apk add -U wget ca-certificates
     - docker login -u gitlab-ci-token -p "${CI_JOB_TOKEN}" "${CI_REGISTRY}"
-    - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+    - docker pull ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG}
     - wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
     - mv clair-scanner_linux_amd64 clair-scanner
     - chmod +x clair-scanner
@@ -297,6 +208,7 @@ container_scan_allow_failure:
     - while( ! wget -T 10 -q -O /dev/null http://docker:6060/v1/namespaces ) ; do sleep 1 ; echo -n "." ; if [ $retries -eq 10 ] ; then echo " Timeout, aborting." ; exit 1 ; fi ; retries=$(($retries+1)) ; done
     - ./clair-scanner -c http://docker:6060 --ip $(hostname -i) -r container-scanning-report.json -l clair.log ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG} || true
     - cat container-scanning-report.json
+  allow_failure: true
   artifacts:
     paths: [container-scanning-report.json]
 
@@ -318,7 +230,7 @@ container_scan:
     - docker run -p 6060:6060 --link db:postgres -d --name clair --restart on-failure arminc/clair-local-scan:v2.0.1
     - apk add -U wget ca-certificates
     - docker login -u gitlab-ci-token -p "${CI_JOB_TOKEN}" "${CI_REGISTRY}"
-    - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+    - docker pull ${CI_REGISTRY_IMAGE}/base:${CI_COMMIT_REF_SLUG}
     - wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
     - mv clair-scanner_linux_amd64 clair-scanner
     - chmod +x clair-scanner
@@ -487,12 +399,15 @@ doc1:
     - apt-get install -y graphviz graphviz-dev
   script:
     - pip install -r requirements.dev.txt
-    - mkdir -p doc1/call-graphs/alerts
-    - mkdir -p doc1/call-graphs/base
+    - mkdir -p doc1/app/api/v1/models
+    - mkdir -p doc1/app/api/v1/routes
+    - mkdir -p doc1/app/api/v1/api
+    - mkdir -p doc1/app/config/config
     # Call-graphs
-    - code2flow src/manage.py --output doc1/call-graphs/manage.png
-    - code2flow src/alerts/engine.py --output doc1/call-graphs/alerts/engine.png
-    - code2flow src/base/admin.py --output doc1/call-graphs/base/admin.png
+    - code2flow app/api/v1/models/models.py --output doc1/app/api/v1/models/models.png
+    - code2flow app/api/v1/routes/targets.py --output doc1/app/api/v1/routes/targets.png
+    - code2flow app/api/v1/api.py --output doc1/app/api/v1/api.png
+    - code2flow app/config/config.py --output doc1/app/config/config.png
     # Dependencies
     - mkdir -p doc1/dependencies
     - pipdeptree --graph-output svg > dependencies.svg
@@ -500,7 +415,7 @@ doc1:
     # Classes and packages
     - mkdir -p doc1/classes
     - mkdir -p doc1/packages
-    - pyreverse -o png src/
+    - pyreverse -o png app/
     - mv classes.png doc1/classes
     - mv packages.png doc1/packages
   artifacts:
@@ -518,19 +433,15 @@ doc2:
     - master
     - tags
     - /^doc.*$/
-  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
-  variables:
-    POSTGRES_DB: backend
-    POSTGRES_USER: backend
-    POSTGRES_PASSWORD: password
-    DATABASE_HOST: postgres
+  image: docker:stable
   services:
-    - name: mdillon/postgis:10
-      alias: postgres
+    - docker:20.10.12-dind
+  variables:
+    DOCKER_DRIVER: overlay2
   script:
-    - mkdir -p doc2
-    - pip install -r requirements.dev.txt
-    - python3 src/manage.py graph_models -o doc2/models.png -a
+    # Docker-compose-viz
+    - mkdir -p doc2 && chmod 777 doc2
+    - docker run --rm --name dvc -v $(pwd):/input:rw pmsipilot/docker-compose-viz render -m image --output-file doc2/docker-compose.png docker-compose.yml
   artifacts:
     paths:
       - doc2/
