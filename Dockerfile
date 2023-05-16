@@ -4,7 +4,14 @@ WORKDIR /app
 
 COPY ./requirements.txt /code/requirements.txt
 
+RUN apt-get update
+
+RUN apt-get -y install libpq-dev
+
+RUN apt-get -y install python-dev
+
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-COPY ./app /code/app
+EXPOSE 8086
 
+COPY ./app /code/app

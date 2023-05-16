@@ -10,3 +10,5 @@ pipdeptree==2.2.1
 graphviz==0.19.1
 pylint==2.13.5
 pycallgraph==1.0.1
+pytest==5.2.2
+pytest-coverage==0.0
