@@ -2,10 +2,17 @@ version: "3.4"
 
 services:
   web:
-    build: .
+    build: ./
+    image: registry.gitlab.com/trq-fundacion/api-monitoreo:v1-0-0
     command: uvicorn app.main:app --host 0.0.0.0
     env_file: .env
     volumes:
       - .:/app
     ports:
-      - ${API_PORT}:8000 
+      - ${API_PORT}:8000
+    logging:
+      driver: json-file
+      options:
+        max-file: '3'
+        max-size: 10m
+    restart: on-failure

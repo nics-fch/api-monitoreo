@@ -9,3 +9,5 @@ code2flow==2.5.0
 pipdeptree==2.2.1
 graphviz==0.19.1
 pylint==2.13.5
+pytest==5.2.2
+pytest-coverage==0.0
