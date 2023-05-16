@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 #from tortoise.contrib.fastapi import register_tortoise
 #from tortoise.exceptions import DoesNotExist
-from ..controllers.dataController import getAlert, getHistoryAlert
+from ..controllers.monitorController import getAlert, getHistoryAlert
 from uuid import UUID
 
 # We create our router
