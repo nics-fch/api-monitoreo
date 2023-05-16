@@ -417,7 +417,7 @@ doc1:
     - mkdir -p doc1/packages
     - pyreverse -o png app/
     - mv classes.png doc1/classes
-    - mv packages.png doc1/packages
+    #- mv packages.png doc1/packages
   artifacts:
     paths:
       - doc1/
