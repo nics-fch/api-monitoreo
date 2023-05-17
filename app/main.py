@@ -4,6 +4,7 @@ from tortoise import Tortoise
 from .routes.monitorRoute import router
 #from dotenv import load_dotenv
 from .config.db import init_db
+from fastapi.middleware.cors import CORSMiddleware
 
 # Loading environment variables from .env
 #load_dotenv()
@@ -15,6 +16,19 @@ app = FastAPI(
     description="SMC - API Monitoreo DP",
 )
 
+# Configure the allowed origins for CORS
+origins = [
+    "*",
+]
+
+# Add CORS middleware to your app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event():
