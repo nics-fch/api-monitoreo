@@ -40,25 +40,32 @@ async def getAlert(instalacion_id: UUID):
 
         history = [{
             'fecha': '12/04/2023',
-            'evento': 'Lorem ipsum dolor sit amet consectetur pellentesque',
-            'alerta': 'Amarillo',
-            'estado': 'Activo',
-            'descripcion': 'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet',
-            'mensaje': 'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis'
+            'evento': 'Terremoto perceptible en que el operador no puede mantenerse de pie.',
+            'alerta': 'Amarilla',
+            'estado': 'Cerrada',
+            'descripcion': 'Se detecta un sismo que genera un movimiento suficientemente fuerte para que un operador no pueda continuar en pie. Su activación puede ser manual o automática, a través de un acelerógrafo.',
+            'mensaje': 'La evaluación de la situación indica que no hay peligro de inestabilidad y la alerta se puede cerrar.'
         },{
             'fecha': '14/05/2023',
-            'evento': 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium',
+            'evento': 'Terremoto perceptible en que el operador no puede mantenerse de pie.',
             'alerta': 'Amarilla',
-            'estado': 'Inactivo',
-            'descripcion': 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque',
-            'mensaje': 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur'
+            'estado': 'Abierta',
+            'descripcion': 'Se detecta un sismo que genera un movimiento suficientemente fuerte para que un operador no pueda continuar en pie. Su activación puede ser manual o automática, a través de un acelerógrafo.',
+            'mensaje': 'La autoridad y la compañía minera están evaluando la situación. Se informará a la brevedad.'
         },{
             'fecha': '15/06/2023',
-            'evento': 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit',
-            'alerta': 'Roja',
-            'estado': 'Inactivo',
-            'descripcion': 'Aquas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga',
-            'mensaje': 'Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus.'
+            'evento': 'Terremoto perceptible en que el operador no puede mantenerse de pie.',
+            'alerta': 'Amarilla',
+            'estado': 'Cerrada',
+            'descripcion': 'Se detecta un sismo que genera un movimiento suficientemente fuerte para que un operador no pueda continuar en pie. Su activación puede ser manual o automática, a través de un acelerógrafo.',
+            'mensaje': 'La evaluación de la situación indica que no hay peligro de inestabilidad y la alerta se puede cerrar.',
+        },{
+            'fecha': '18/06/2023',
+            'evento': 'Terremoto perceptible en que el operador no puede mantenerse de pie.',
+            'alerta': 'Amarilla',
+            'estado': 'Abierta',
+            'descripcion': 'Se detecta un sismo que genera un movimiento suficientemente fuerte para que un operador no pueda continuar en pie. Su activación puede ser manual o automática, a través de un acelerógrafo.',
+            'mensaje': 'La autoridad y la compañía minera están evaluando la situación. Se informará a la brevedad.',
         }]
 
         return { "status": 200, "response": { "alert": alert, "history": history } }
