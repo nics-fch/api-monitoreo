@@ -399,13 +399,15 @@ doc1:
     - apt-get install -y graphviz graphviz-dev
   script:
     - pip install -r requirements.dev.txt
-    - mkdir -p doc1/call-graphs/alerts
-    - mkdir -p doc1/call-graphs/base
+    - mkdir -p doc1/app/api/v1/models
+    - mkdir -p doc1/app/api/v1/routes
+    - mkdir -p doc1/app/api/v1/api
+    - mkdir -p doc1/app/config/config
     # Call-graphs
-    - code2flow app/api/v1/models/models.py --output app/api/v1/models/models.png
-    - code2flow app/api/v1/routes/targets.py --output app/api/v1/routes/targets.png
-    - code2flow app/api/v1/api.py --output app/api/v1/api.png
-    - code2flow app/config/config.py --output app/config/config.png
+    - code2flow app/api/v1/models/models.py --output doc1/app/api/v1/models/models.png
+    - code2flow app/api/v1/routes/targets.py --output doc1/app/api/v1/routes/targets.png
+    - code2flow app/api/v1/api.py --output doc1/app/api/v1/api.png
+    - code2flow app/config/config.py --output doc1/app/config/config.png
     # Dependencies
     - mkdir -p doc1/dependencies
     - pipdeptree --graph-output svg > dependencies.svg
@@ -415,7 +417,7 @@ doc1:
     - mkdir -p doc1/packages
     - pyreverse -o png app/
     - mv classes.png doc1/classes
-    - mv packages.png doc1/packages
+    #- mv packages.png doc1/packages
   artifacts:
     paths:
       - doc1/
