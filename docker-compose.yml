@@ -35,5 +35,20 @@ services:
     depends_on:
       - AuthDBA
 
+  dbeaver:
+    image: dbeaver/cloudbeaver:latest
+    ports:
+      - 8079:8978
+    volumes:
+      - /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace-api-monitoreo
+    logging:
+      driver: json-file
+      options:
+        max-file: '3'
+        max-size: 10m
+    restart: on-failure
+    depends_on:
+      - AuthDBA
+
 volumes:
   AuthDBA_data:
