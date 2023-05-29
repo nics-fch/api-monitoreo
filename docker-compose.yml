@@ -33,7 +33,6 @@ services:
     depends_on:
       - AuthDBA
 
-
   dbeaver:
     image: dbeaver/cloudbeaver:latest
     ports:
