@@ -92,6 +92,7 @@ test:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
+
 # Generates a report of the used libraries by this repo with the licenses
 licenses_allow_failure:
   stage: test
@@ -245,34 +246,34 @@ container_scan:
     paths: [container-scanning-report.json]
 
 # Vulnerability scanning: Control of security, compliance and health with a toolkit that will scan this repo.
-test:vulnerabilities_allow_failure:
-  stage: test
-  only:
-    - dev
-    - fch-alpha
-    - infy-dev
-    - alpha
-    - tags
-  image:
-    name: debricked/debricked-scan
-    entrypoint: ["/gitlab-ci.sh"]
-  script: echo "Done"
-  allow_failure: true
-  variables:
-    DEBRICKED_TOKEN: $DEBRICKED_TOKEN
+#test:vulnerabilities_allow_failure:
+#  stage: test
+#  only:
+#    - dev
+#    - fch-alpha
+#    - infy-dev
+#    - alpha
+#    - tags
+#  image:
+#    name: debricked/debricked-scan
+#    entrypoint: ["/gitlab-ci.sh"]
+#  script: echo "Done"
+#  allow_failure: true
+#  variables:
+#    DEBRICKED_TOKEN: $DEBRICKED_TOKEN
 
 # Vulnerability scanning: Control of security, compliance and health with a toolkit that will scan this repo.
-test:vulnerabilities:
-  stage: test
-  only:
-    - preprod
-    - master
-  image:
-    name: debricked/debricked-scan
-    entrypoint: ["/gitlab-ci.sh"]
-  script: echo "Done"
-  variables:
-    DEBRICKED_TOKEN: $DEBRICKED_TOKEN
+#test:vulnerabilities:
+#  stage: test
+#  only:
+#    - preprod
+#    - master
+#  image:
+#    name: debricked/debricked-scan
+#    entrypoint: ["/gitlab-ci.sh"]
+#  script: echo "Done"
+#  variables:
+#    DEBRICKED_TOKEN: $DEBRICKED_TOKEN
 
 # SonarQube is an automatic code review tool to detect bugs, vulnerabilities, and code smells in your code.
 # It can integrate with your existing workflow to enable continuous code inspection across your project branches
@@ -381,6 +382,48 @@ deploy-manual:
   artifacts:
     paths: [deploy-manual.txt]
 
+create_jira_test_fail:
+  stage: deploy
+  image: alpine:3.8
+  when: on_failure
+  before_script:
+    - apk add --update --no-cache curl
+  script: >-
+    curl --request POST
+    --url https://${JIRA_SERVER}/rest/api/3/issue
+    --user $USER
+    --header 'Accept: application/json'
+    --header 'Content-Type: application/json'
+    --data '{ "fields": { "project": { "key": "ST4" }, "summary": "'${CI_PROJECT_TITLE}': Test NOK in pipeline", "description": { "type": "doc", "version": 1, "content": [ { "type": "paragraph", "content": [ { "text": "'${CI_PIPELINE_URL}'", "type": "text" } ] } ] }, "issuetype": { "name": "Error" }, "customfield_10113" : "'${CI_PIPELINE_URL}'" } }'
+
+jira:
+  stage: test
+  image: alpine:3.8
+  before_script:
+    - wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+    - mv jq-linux64 /usr/bin/jq
+    - chmod a+x /usr/bin/jq
+    - apk add --update curl && rm -rf /var/cache/apk/*
+  script:
+    # extract the JIRA Id out of the Merge Request title. The following
+    # logic assumes a Merge Request title must start with a valid JIRA issue id
+    # and that all JIRA projects start with a letter
+    - export MERGE_REQUEST_JIRA_ID=$(echo ${CI_MERGE_REQUEST_TITLE} | sed -r "s/^([A-Za-z][A-Za-z0-9]+-[0-9]+).*/\1/")
+    # validate we successfully extracted a Jira Issue Id
+    - test "${MERGE_REQUEST_JIRA_ID}" == $(echo ${CI_MERGE_REQUEST_TITLE} | sed -r "s/^([A-Za-z][A-Za-z0-9]+-[0-9]+).*/\1/")
+    # try and get the relevant information from JIRA,
+    # capture result in a variable so can parse and run multiple
+    # tests and validation steps
+    # following only gets the issue status information to minimise traffic and
+    # optimise execution time
+    - export JIRA_DETAIL=$(curl -v https://${JIRA_SERVER} --user ${JIRA_USERNAME}:${JIRA_TOKEN} -H "${JIRA_HEADER}" -X GET https://${JIRA_SERVER}/rest/api/2/issue/${MERGE_REQUEST_JIRA_ID}?fields=status)
+    # extract the JIRA key id, this also validates JIRA issue referenced is valid
+    - echo ${JIRA_DETAIL} | jq -e '.key'
+    # optionally test status of the JIRA issue matches a desired "status"
+    #- test -z "$(echo ${JIRA_DETAIL} | jq '.fields.status.name' | sed -r "s/\"(Open|In Progress)\"//")")"
+  only:
+    - merge_requests
+
 # Generate the documentation
 doc1:
   stage: deploy
@@ -445,45 +488,3 @@ doc2:
   artifacts:
     paths:
       - doc2/
-
-create_jira_test_fail:
-  stage: deploy
-  image: alpine:3.8
-  when: on_failure
-  before_script:
-    - apk add --update --no-cache curl
-  script: >-
-    curl --request POST
-    --url https://${JIRA_SERVER}/rest/api/3/issue
-    --user $USER
-    --header 'Accept: application/json'
-    --header 'Content-Type: application/json'
-    --data '{ "fields": { "project": { "key": "ST4" }, "summary": "'${CI_PROJECT_TITLE}': Test NOK in pipeline", "description": { "type": "doc", "version": 1, "content": [ { "type": "paragraph", "content": [ { "text": "'${CI_PIPELINE_URL}'", "type": "text" } ] } ] }, "issuetype": { "name": "Error" }, "customfield_10113" : "'${CI_PIPELINE_URL}'" } }'
-
-jira:
-  stage: test
-  allow_failure: false
-  before_script:
-    - wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-    - mv jq-linux64 /usr/bin/jq
-    - chmod a+x /usr/bin/jq
-    - apk add --update curl && rm -rf /var/cache/apk/*
-  script:
-    # extract the JIRA Id out of the Merge Request title. The following
-    # logic assumes a Merge Request title must start with a valid JIRA issue id
-    # and that all JIRA projects start with a letter
-    - export MERGE_REQUEST_JIRA_ID=$(echo ${CI_MERGE_REQUEST_TITLE} | sed -r "s/^([A-Za-z][A-Za-z0-9]+-[0-9]+).*/\1/")
-    # validate we successfully extracted a Jira Issue Id
-    - test "${MERGE_REQUEST_JIRA_ID}" == $(echo ${CI_MERGE_REQUEST_TITLE} | sed -r "s/^([A-Za-z][A-Za-z0-9]+-[0-9]+).*/\1/")
-    # try and get the relevant information from JIRA,
-    # capture result in a variable so can parse and run multiple
-    # tests and validation steps
-    # following only gets the issue status information to minimise traffic and
-    # optimise execution time
-    - export JIRA_DETAIL=$(curl -v https://${JIRA_SERVER} --user ${JIRA_USERNAME}:${JIRA_TOKEN} -H "${JIRA_HEADER}" -X GET https://${JIRA_SERVER}/rest/api/2/issue/${MERGE_REQUEST_JIRA_ID}?fields=status)
-    # extract the JIRA key id, this also validates JIRA issue referenced is valid
-    - echo ${JIRA_DETAIL} | jq -e '.key'
-    # optionally test status of the JIRA issue matches a desired "status"
-    #- test -z "$(echo ${JIRA_DETAIL} | jq '.fields.status.name' | sed -r "s/\"(Open|In Progress)\"//")")"
-  only:
-    - merge_requests
