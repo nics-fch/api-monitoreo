@@ -30,7 +30,6 @@ docker-image-api-monitoreo:
     - preprod
     - master
     - tags
-    - merge_requests
   tags:
     - docker
   image: docker:20.10.12
