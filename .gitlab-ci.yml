@@ -23,8 +23,6 @@ stages:
 docker-image-api-monitoreo:
   stage: build
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - preprod
@@ -54,8 +52,6 @@ docker-image-api-monitoreo:
 lint_automatic_allow_failure:
   <<: *lint
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - tags
@@ -71,8 +67,6 @@ lint:
 test:
   stage: test
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - preprod
@@ -96,8 +90,6 @@ test:
 licenses_allow_failure:
   stage: test
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - tags
@@ -129,8 +121,6 @@ licenses:
 owasp_dependency_check_allow_failure:
   stage: test
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - tags
@@ -182,8 +172,6 @@ owasp_dependency_check:
 container_scan_allow_failure:
   stage: test
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - tags
@@ -248,8 +236,6 @@ container_scan:
 #test:vulnerabilities_allow_failure:
 #  stage: test
 #  only:
-#    - dev
-#    - fch-alpha
 #    - infy-dev
 #    - alpha
 #    - tags
@@ -280,8 +266,6 @@ container_scan:
 sonar_allow_failure:
   stage: test
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - tags
@@ -329,7 +313,6 @@ sonar:
 deploy-main:
   stage: deploy
   only:
-    - dev
     - infy-dev
   except:
     refs:
@@ -427,8 +410,6 @@ jira:
 doc1:
   stage: deploy
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - preprod
@@ -467,8 +448,6 @@ doc1:
 doc2:
   stage: deploy
   only:
-    - dev
-    - fch-alpha
     - infy-dev
     - alpha
     - preprod
