@@ -11,8 +11,8 @@ ENV PYTHONUNBUFFERED=1
 # Install pip requirements
 COPY requirements.txt .
 RUN apt-get update
-RUN apt-get -y install libpq-dev
-RUN apt-get -y install python-dev
+RUN apt-get -y --no-install-recommends install libpq-dev
+RUN apt-get -y --no-install-recommends install python-dev
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
