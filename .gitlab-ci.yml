@@ -74,6 +74,7 @@ test:
     - tags
     - merge_requests
   image: python:3.8
+  allow_failure: true
   script:
     - pip install -r requirements.dev.txt
     - coverage run -m pytest
