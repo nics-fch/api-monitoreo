@@ -326,7 +326,6 @@ deploy-main:
       - merge_requests
       - tags
   image: alpine:3.8
-  allow_failure: true
   variables:
     TRIGGER_TOKEN: a04d93dc51289813818bea8044dda4
     TRIGGER_URL: https://gitlab.com/api/v4/projects/21321480/trigger/pipeline
@@ -355,7 +354,6 @@ deploy-manual:
       - tags
   image: alpine:3.8
   when: manual
-  allow_failure: true
   variables:
     TRIGGER_TOKEN: a04d93dc51289813818bea8044dda4
     TRIGGER_URL: https://gitlab.com/api/v4/projects/21321480/trigger/pipeline
