@@ -97,6 +97,6 @@ async def init_db(app: FastAPI):
         db_url="postgres://"+POSTGRES_USER+":"+POSTGRES_PASSWORD+"@"+DATABASE_HOST+":"+DATABASE_PORT+"/"+POSTGRES_DB,
         #db_url='postgres://{}:{}@{}:{}/{}'.format(POSTGRES_USER, POSTGRES_PASSWORD, DATABASE_HOST, DATABASE_PORT, POSTGRES_DB),
         modules={"models": ["app.models.ticketModel", "app.models.ticketLogModel", "app.models.ticketCommentModel", "app.models.autorizathionRequestModel"]},
-        generate_schemas=True,
+        generate_schemas=False,
         add_exception_handlers=True
     )
