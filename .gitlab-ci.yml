@@ -357,6 +357,10 @@ deploy-manual:
 
 create_jira_test_fail:
   stage: deploy
+  only:
+    - alpha
+    - preprod
+    - master
   image: alpine:3.8
   when: on_failure
   before_script:
