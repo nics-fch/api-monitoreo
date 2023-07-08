@@ -323,7 +323,6 @@ deploy-main:
       - pushes
       - schedules
       - triggers
-      - merge_requests
       - tags
   image: alpine:3.8
   variables:
