@@ -1,8 +1,3 @@
-include:
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
-  - template: Code-Quality.gitlab-ci.yml
-
 # List of all variables
 variables:
   DOCKER_HOST: tcp://docker:2375/
@@ -303,6 +298,15 @@ sonar:
                     -Dsonar.python.coverage.reportPaths=coverage-reports/coverage-report.xml > sonar.txt
   artifacts:
     paths: [sonar.txt]
+
+security:
+  stage: test
+  trigger:
+    include: child-pipelines/.gitlab-ci.yml
+  only:
+    - alpha
+    - preprod
+    - master
 
 deploy-main:
   stage: deploy
