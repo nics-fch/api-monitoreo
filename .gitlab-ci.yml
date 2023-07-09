@@ -52,7 +52,6 @@ docker-image-api-monitoreo:
 lint_automatic_allow_failure:
   <<: *lint
   only:
-    - infy-dev
     - alpha
     - tags
   allow_failure: true
@@ -67,7 +66,6 @@ lint:
 test:
   stage: test
   only:
-    - infy-dev
     - alpha
     - preprod
     - master
@@ -91,7 +89,6 @@ test:
 licenses_allow_failure:
   stage: test
   only:
-    - infy-dev
     - alpha
     - tags
   image: python:3.8
@@ -122,7 +119,6 @@ licenses:
 owasp_dependency_check_allow_failure:
   stage: test
   only:
-    - infy-dev
     - alpha
     - tags
   image:
@@ -173,7 +169,6 @@ owasp_dependency_check:
 container_scan_allow_failure:
   stage: test
   only:
-    - infy-dev
     - alpha
     - tags
   image: docker:stable
@@ -237,7 +232,6 @@ container_scan:
 #test:vulnerabilities_allow_failure:
 #  stage: test
 #  only:
-#    - infy-dev
 #    - alpha
 #    - tags
 #  image:
@@ -267,7 +261,6 @@ container_scan:
 sonar_allow_failure:
   stage: test
   only:
-    - infy-dev
     - alpha
     - tags
   image:
@@ -364,6 +357,10 @@ deploy-manual:
 
 create_jira_test_fail:
   stage: deploy
+  only:
+    - alpha
+    - preprod
+    - master
   image: alpine:3.8
   when: on_failure
   before_script:
@@ -408,7 +405,6 @@ jira:
 doc1:
   stage: deploy
   only:
-    - infy-dev
     - alpha
     - preprod
     - master
@@ -446,7 +442,6 @@ doc1:
 doc2:
   stage: deploy
   only:
-    - infy-dev
     - alpha
     - preprod
     - master
