@@ -313,14 +313,8 @@ deploy-main:
   only:
     - infy-dev
   except:
-    refs:
-      # everything but {pipelines, web, branches, tags}
-      - api
-      - external
-      - pushes
-      - schedules
-      - triggers
-      - tags
+    variables:
+      - $DEPLOY == "artifacts"
   image: alpine:3.8
   variables:
     TRIGGER_TOKEN: a04d93dc51289813818bea8044dda4
@@ -334,7 +328,6 @@ deploy-main:
 deploy-manual:
   stage: deploy
   only:
-    - fch-alpha
     - alpha
     - preprod
     - master
