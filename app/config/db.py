@@ -14,6 +14,7 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_PORT = os.getenv("DATABASE_PORT")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
+SCHEMA = os.getenv("SCHEMA")
 
 origins = [
     # local
@@ -94,9 +95,9 @@ origins = [
 async def init_db(app: FastAPI):
     register_tortoise(
         app,
-        db_url="postgres://"+POSTGRES_USER+":"+POSTGRES_PASSWORD+"@"+DATABASE_HOST+":"+DATABASE_PORT+"/"+POSTGRES_DB,
+        db_url="postgres://"+POSTGRES_USER+":"+POSTGRES_PASSWORD+"@"+DATABASE_HOST+":"+DATABASE_PORT+"/"+POSTGRES_DB+"?schema="+SCHEMA,
         #db_url='postgres://{}:{}@{}:{}/{}'.format(POSTGRES_USER, POSTGRES_PASSWORD, DATABASE_HOST, DATABASE_PORT, POSTGRES_DB),
-        modules={"models": ["app.models.ticketModel", "app.models.ticketLogModel", "app.models.ticketCommentModel", "app.models.autorizathionRequestModel"]},
+        modules={"models": ["app.models.monitorModel"]},
         generate_schemas=True,
         add_exception_handlers=True
     )
